@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #111;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app {
+  text-align: center;
+  padding: 2rem;
+}
+
+.energy {
+  font-size: 2rem;
+  color: #4a9eff;
+}
+
+.btn-gather {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #4a9eff;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.btn-gather:active {
+  transform: scale(0.97);
+}
