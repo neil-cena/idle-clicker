@@ -8,23 +8,26 @@ body {
   background: #111;
   color: #eee;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .app {
-  text-align: center;
-  padding: 2rem;
+  padding: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.app h1 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
 }
 
 .energy {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #4a9eff;
 }
 
 .btn-gather {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
   background: #4a9eff;
@@ -34,5 +37,52 @@ body {
 }
 
 .btn-gather:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
+}
+
+.generators {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.generator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #1a1a1e;
+}
+
+.generator-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.generator-name {
+  font-weight: 600;
+}
+
+.generator-stats {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.generator-buy {
+  padding: 0.5rem 1rem;
+  background: #f97316;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.generator-buy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
