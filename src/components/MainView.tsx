@@ -1,7 +1,7 @@
 import { useGameStore } from '../engine/gameState'
 import { GeneratorRow } from './GeneratorRow'
+import { ResourceDisplay } from './ResourceDisplay'
 import { GENERATORS } from '../engine/generators'
-import { formatNumber } from '../utils/format'
 
 export function MainView() {
   const energy = useGameStore((s) => s.energy)
@@ -11,7 +11,9 @@ export function MainView() {
 
   return (
     <div className="main-view">
-      <p className="energy">Energy: {formatNumber(Math.floor(energy))}</p>
+      <p className="energy">
+        Energy: <ResourceDisplay value={energy} />
+      </p>
       <button type="button" className="btn-gather" onClick={click}>
         Gather
       </button>
