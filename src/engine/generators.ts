@@ -25,3 +25,12 @@ export function getProduction(def: GeneratorDef, owned: number): number {
 export function getTotalProduction(counts: Record<string, number>): number {
   return GENERATORS.reduce((sum, g) => sum + getProduction(g, counts[g.id] ?? 0), 0)
 }
+
+const MILESTONES = [25, 50, 100]
+const MILESTONE_MULT = 2
+
+export function getMilestoneMultiplier(owned: number): number {
+  let mult = 1
+  for (const m of MILESTONES) if (owned >= m) mult *= MILESTONE_MULT
+  return mult
+}

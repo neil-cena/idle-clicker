@@ -1,5 +1,5 @@
 import type { GeneratorDef } from '../engine/generators'
-import { getCost, getProduction } from '../engine/generators'
+import { getCost, getProduction, getMilestoneMultiplier } from '../engine/generators'
 import { formatNumber } from '../utils/format'
 
 interface GeneratorRowProps {
@@ -11,7 +11,7 @@ interface GeneratorRowProps {
 
 export function GeneratorRow({ def, owned, energy, onBuy }: GeneratorRowProps) {
   const cost = getCost(def, owned)
-  const production = getProduction(def, owned)
+  const production = getProduction(def, owned) * getMilestoneMultiplier(owned)
   const canAfford = energy >= cost
 
   return (
