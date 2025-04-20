@@ -1,5 +1,6 @@
 import { useGameLoop } from './hooks/useGameLoop'
 import { MainView } from './components/MainView'
+import { OfflineModal } from './components/OfflineModal'
 
 function App() {
   useGameLoop()
@@ -9,6 +10,7 @@ function App() {
       <header className="app-header">
         <h1>Idle Incremental</h1>
       </header>
+      <OfflineModal />
       <main className="app-main">
         <MainView />
       </main>

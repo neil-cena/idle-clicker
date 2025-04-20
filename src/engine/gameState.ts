@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import { GENERATORS, getCost } from './generators'
+import { GENERATORS, getCost, getMilestoneMultiplier } from './generators'
 import { load, save } from './saveLoad'
+import { simulateOfflineProgress } from './offline'
 
 const SAVE_INTERVAL_MS = 5000
 
@@ -9,17 +10,20 @@ const initialCounts = () => Object.fromEntries(GENERATORS.map((g) => [g.id, 0]))
 interface GameState {
   energy: number
   counts: Record<string, number>
+  lifetimeEarnings: number
   lastSaveTime: number
   lastTickTime: number
   tick: (now: number) => void
   click: () => void
   buy: (id: string) => void
   loadGame: () => void
+  applyOffline: () => void
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
       energy: 0,
       counts: initialCounts(),
+      lifetimeEarnings: 0,
       lastSaveTime: Date.now(),
       lastTickTime: Date.now(),
 
@@ -30,17 +34,18 @@ export const useGameStore = create<GameState>()((set, get) => ({
         let rate = 0
         GENERATORS.forEach((g) => {
           const owned = state.counts[g.id] ?? 0
-          rate += owned * g.productionPerUnit
+          rate += (owned * g.productionPerUnit) * getMilestoneMultiplier(owned)
         })
         const gained = rate * dt
         set({
           energy: state.energy + gained,
+          lifetimeEarnings: state.lifetimeEarnings + gained,
           lastTickTime: now,
         })
       },
 
       click() {
-        set((s) => ({ energy: s.energy + 1 }))
+        set((s) => ({ energy: s.energy + 1, lifetimeEarnings: s.lifetimeEarnings + 1 }))
       },
 
       buy(id: string) {
@@ -62,7 +67,20 @@ export const useGameStore = create<GameState>()((set, get) => ({
         set({
           energy: data.energy,
           counts: data.counts,
+          lifetimeEarnings: data.lifetimeEarnings,
           lastSaveTime: data.lastSaveTime,
+          lastTickTime: Date.now(),
+        })
+      },
+
+      applyOffline() {
+        const data = load()
+        if (!data) return
+        const { energy, lifetimeEarnings } = simulateOfflineProgress(data, Date.now())
+        set({
+          energy,
+          lifetimeEarnings,
+          lastSaveTime: Date.now(),
           lastTickTime: Date.now(),
         })
       },
@@ -73,6 +91,10 @@ let saveInterval: ReturnType<typeof setInterval> | null = null
 export function startGameLoop() {
   const store = useGameStore.getState()
   store.loadGame()
+  const saved = load()
+  if (saved && saved.lastSaveTime < Date.now() - 1000) {
+    store.applyOffline()
+  }
   if (saveInterval) clearInterval(saveInterval)
   saveInterval = setInterval(() => {
     const state = useGameStore.getState()
@@ -80,7 +102,7 @@ export function startGameLoop() {
       energy: state.energy,
       counts: state.counts,
       essence: 0,
-      lifetimeEarnings: 0,
+      lifetimeEarnings: state.lifetimeEarnings,
       lastSaveTime: state.lastSaveTime,
     })
   }, SAVE_INTERVAL_MS)
