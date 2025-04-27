@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { GENERATORS, getCost, getMilestoneMultiplier } from './generators'
+import { essenceFromLifetimeEarnings, productionMultiplierFromEssence } from './prestige'
 import { load, save } from './saveLoad'
 import { simulateOfflineProgress } from './offline'
 
@@ -10,12 +11,14 @@ const initialCounts = () => Object.fromEntries(GENERATORS.map((g) => [g.id, 0]))
 interface GameState {
   energy: number
   counts: Record<string, number>
+  essence: number
   lifetimeEarnings: number
   lastSaveTime: number
   lastTickTime: number
   tick: (now: number) => void
   click: () => void
   buy: (id: string) => void
+  prestige: () => void
   loadGame: () => void
   applyOffline: () => void
 }
@@ -23,6 +26,7 @@ interface GameState {
 export const useGameStore = create<GameState>()((set, get) => ({
       energy: 0,
       counts: initialCounts(),
+      essence: 0,
       lifetimeEarnings: 0,
       lastSaveTime: Date.now(),
       lastTickTime: Date.now(),
@@ -36,7 +40,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
           const owned = state.counts[g.id] ?? 0
           rate += (owned * g.productionPerUnit) * getMilestoneMultiplier(owned)
         })
-        const gained = rate * dt
+        const mult = productionMultiplierFromEssence(state.essence)
+        const gained = rate * dt * mult
         set({
           energy: state.energy + gained,
           lifetimeEarnings: state.lifetimeEarnings + gained,
@@ -45,7 +50,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
       },
 
       click() {
-        set((s) => ({ energy: s.energy + 1, lifetimeEarnings: s.lifetimeEarnings + 1 }))
+        const mult = productionMultiplierFromEssence(get().essence)
+        set((s) => ({ energy: s.energy + 1 * mult, lifetimeEarnings: s.lifetimeEarnings + 1 * mult }))
       },
 
       buy(id: string) {
@@ -61,12 +67,26 @@ export const useGameStore = create<GameState>()((set, get) => ({
         }))
       },
 
+      prestige() {
+        const state = get()
+        const newEssence = essenceFromLifetimeEarnings(state.lifetimeEarnings)
+        if (newEssence <= state.essence) return
+        set({
+          energy: 0,
+          counts: initialCounts(),
+          essence: state.essence + newEssence,
+          lifetimeEarnings: 0,
+          lastSaveTime: Date.now(),
+        })
+      },
+
       loadGame() {
         const data = load()
         if (!data) return
         set({
           energy: data.energy,
           counts: data.counts,
+          essence: data.essence,
           lifetimeEarnings: data.lifetimeEarnings,
           lastSaveTime: data.lastSaveTime,
           lastTickTime: Date.now(),
@@ -101,7 +121,7 @@ export function startGameLoop() {
     save({
       energy: state.energy,
       counts: state.counts,
-      essence: 0,
+      essence: state.essence,
       lifetimeEarnings: state.lifetimeEarnings,
       lastSaveTime: state.lastSaveTime,
     })

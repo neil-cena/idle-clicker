@@ -114,7 +114,62 @@ body {
   cursor: not-allowed;
 }
 
+.prestige-panel {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.prestige-gain {
+  color: var(--success);
+  font-size: 0.9rem;
+}
+
+.btn-prestige {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--cta);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-prestige:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 90vw;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
 .muted {
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+@media (min-width: 600px) {
+  .app {
+    padding: 1.5rem;
+  }
 }
