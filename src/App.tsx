@@ -1,6 +1,7 @@
 import { useGameLoop } from './hooks/useGameLoop'
 import { MainView } from './components/MainView'
 import { PrestigePanel } from './components/PrestigePanel'
+import { UpgradePanel } from './components/UpgradePanel'
 import { OfflineModal } from './components/OfflineModal'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <main className="app-main">
         <MainView />
         <PrestigePanel />
+        <UpgradePanel />
       </main>
     </div>
   )
