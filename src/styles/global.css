@@ -42,6 +42,17 @@ body {
   font-size: 1.5rem;
 }
 
+.btn-icon {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
 .app-main {
   flex: 1;
   display: flex;
@@ -163,9 +174,52 @@ body {
   margin-top: 0;
 }
 
+.settings-modal label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
 .muted {
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+.particle-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: particle-out 0.5s ease-out forwards;
+  transform: translate(calc(-50% + var(--x, 0)), calc(-50% + var(--y, 0)));
+}
+
+@keyframes particle-out {
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x, 0)), calc(-50% + var(--y, 0))) scale(0);
+  }
+}
+
+.app.shake {
+  animation: screen-shake 0.12s ease-out;
+}
+
+@keyframes screen-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
 }
 
 @media (min-width: 600px) {
