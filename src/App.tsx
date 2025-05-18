@@ -5,11 +5,13 @@ import { MainView } from './components/MainView'
 import { PrestigePanel } from './components/PrestigePanel'
 import { UpgradePanel } from './components/UpgradePanel'
 import { OfflineModal } from './components/OfflineModal'
+import { SettingsPanel } from './components/SettingsPanel'
 import { ParticleEffect } from './components/ParticleEffect'
 
 function App() {
   useGameLoop()
   const { playClick, playBuy } = useAudio()
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [shake, setShake] = useState(false)
   const [particleTrigger, setParticleTrigger] = useState(0)
 
@@ -23,6 +25,14 @@ function App() {
     <div className={`app theme-dark${shake ? ' shake' : ''}`}>
       <header className="app-header">
         <h1>Idle Incremental</h1>
+        <button
+          type="button"
+          className="btn-icon"
+          onClick={() => setSettingsOpen(true)}
+          aria-label="Settings"
+        >
+          \u2699
+        </button>
       </header>
       <OfflineModal />
       <main className="app-main">
@@ -36,6 +46,7 @@ function App() {
         <UpgradePanel />
       </main>
       <ParticleEffect trigger={particleTrigger} />
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

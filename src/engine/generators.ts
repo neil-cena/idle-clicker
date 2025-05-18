@@ -29,7 +29,6 @@ export function getTotalProduction(counts: Record<string, number>): number {
 const MILESTONES = [25, 50, 100]
 const MILESTONE_MULT = 2
 
-// TODO: consider adding synergy bonus between adjacent tiers
 export function getMilestoneMultiplier(owned: number): number {
   let mult = 1
   for (const m of MILESTONES) if (owned >= m) mult *= MILESTONE_MULT
