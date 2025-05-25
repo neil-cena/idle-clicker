@@ -18,7 +18,7 @@ export function GeneratorRow({ def, owned, energy, onBuy }: GeneratorRowProps) {
     <div className="generator-row">
       <div className="generator-info">
         <span className="generator-name">{def.name}</span>
-        <span className="generator-stats">Owned: {owned} \u00b7 +{formatNumber(production)}/s</span>
+        <span className="generator-stats">Owned: {owned} · +{formatNumber(production)}/s</span>
       </div>
       <button
         type="button"

@@ -31,7 +31,7 @@ function App() {
           onClick={() => setSettingsOpen(true)}
           aria-label="Settings"
         >
-          \u2699
+          ⚙
         </button>
       </header>
       <OfflineModal />

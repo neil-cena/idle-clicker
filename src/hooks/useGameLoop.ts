@@ -7,8 +7,8 @@ export function useGameLoop() {
 
   useEffect(() => {
     startGameLoop()
-    function loop(now: number) {
-      tick(now)
+    function loop() {
+      tick(Date.now())
       raf.current = requestAnimationFrame(loop)
     }
     raf.current = requestAnimationFrame(loop)

@@ -17,18 +17,17 @@ export function ResourceDisplay({ value, className }: ResourceDisplayProps) {
   useEffect(() => {
     let raf = 0
     function tick() {
-      const target = targetRef.current
       setDisplay((d) => {
+        const target = targetRef.current
         const diff = target - d
-        if (Math.abs(diff) < 1) return target
-        const next = d + diff * 0.15
-        raf = requestAnimationFrame(tick)
-        return next
+        if (Math.abs(diff) < 0.01) return target
+        return d + diff * 0.15
       })
+      raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [value])
+  }, [])
 
   return <span className={className}>{formatNumber(Math.floor(display))}</span>
 }

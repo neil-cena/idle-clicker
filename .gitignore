@@ -4,7 +4,6 @@ node_modules
 # Build
 dist
 *.local
-tsconfig.tsbuildinfo
 
 # IDE
 .idea
@@ -28,5 +27,3 @@ android/build
 android/capacitor.build.json
 
 GDD.pdf
-*.bak
-msg.txt

@@ -11,8 +11,8 @@ export function ParticleEffect({ trigger }: ParticleEffectProps) {
     if (trigger <= 0) return
     const newParticles = Array.from({ length: 12 }, (_, i) => ({
       id: Date.now() + i,
-      x: (Math.random() - 0.5) * 100,
-      y: (Math.random() - 0.5) * 100,
+      x: (Math.random() - 0.5) * 120,
+      y: (Math.random() - 0.5) * 120,
     }))
     setParticles(newParticles)
     const t = setTimeout(() => setParticles([]), 600)

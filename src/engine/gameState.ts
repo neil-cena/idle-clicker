@@ -8,6 +8,20 @@ const SAVE_INTERVAL_MS = 5000
 
 const initialCounts = () => Object.fromEntries(GENERATORS.map((g) => [g.id, 0]))
 
+function safeNumber(value: unknown, fallback = 0): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function safeCounts(raw: unknown): Record<string, number> {
+  const counts = initialCounts()
+  if (!raw || typeof raw !== 'object') return counts
+  for (const g of GENERATORS) {
+    const owned = safeNumber((raw as Record<string, unknown>)[g.id], 0)
+    counts[g.id] = Math.max(0, Math.floor(owned))
+  }
+  return counts
+}
+
 interface GameState {
   energy: number
   counts: Record<string, number>
@@ -33,73 +47,98 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
       tick(now: number) {
         const state = get()
-        const dt = (now - state.lastTickTime) / 1000
+        const tickNow = safeNumber(now, Date.now())
+        const dt = (tickNow - safeNumber(state.lastTickTime, tickNow)) / 1000
         if (dt <= 0) return
         let rate = 0
         GENERATORS.forEach((g) => {
-          const owned = state.counts[g.id] ?? 0
+          const owned = safeNumber(state.counts[g.id], 0)
           rate += (owned * g.productionPerUnit) * getMilestoneMultiplier(owned)
         })
-        const mult = productionMultiplierFromEssence(state.essence)
-        const gained = rate * dt * mult
+        const mult = productionMultiplierFromEssence(safeNumber(state.essence, 0))
+        const gained = safeNumber(rate * dt * mult, 0)
         set({
-          energy: state.energy + gained,
-          lifetimeEarnings: state.lifetimeEarnings + gained,
-          lastTickTime: now,
+          energy: safeNumber(state.energy, 0) + gained,
+          lifetimeEarnings: safeNumber(state.lifetimeEarnings, 0) + gained,
+          lastTickTime: tickNow,
         })
       },
 
       click() {
-        const mult = productionMultiplierFromEssence(get().essence)
-        set((s) => ({ energy: s.energy + 1 * mult, lifetimeEarnings: s.lifetimeEarnings + 1 * mult }))
+        const mult = productionMultiplierFromEssence(safeNumber(get().essence, 0))
+        set((s) => ({
+          energy: safeNumber(s.energy, 0) + 1 * mult,
+          lifetimeEarnings: safeNumber(s.lifetimeEarnings, 0) + 1 * mult,
+        }))
       },
 
       buy(id: string) {
         const def = GENERATORS.find((g) => g.id === id)
         if (!def) return
         const state = get()
-        const owned = state.counts[id] ?? 0
+        const owned = safeNumber(state.counts[id], 0)
         const cost = getCost(def, owned)
-        if (state.energy < cost) return
+        if (safeNumber(state.energy, 0) < cost) return
         set((s) => ({
-          energy: s.energy - cost,
-          counts: { ...s.counts, [id]: (s.counts[id] ?? 0) + 1 },
+          energy: safeNumber(s.energy, 0) - cost,
+          counts: { ...s.counts, [id]: safeNumber(s.counts[id], 0) + 1 },
         }))
       },
 
       prestige() {
         const state = get()
-        const newEssence = essenceFromLifetimeEarnings(state.lifetimeEarnings)
-        if (newEssence <= state.essence) return
+        const lifetime = safeNumber(state.lifetimeEarnings, 0)
+        const currentEssence = safeNumber(state.essence, 0)
+        const newEssence = essenceFromLifetimeEarnings(lifetime)
+        if (newEssence <= currentEssence) return
         set({
           energy: 0,
           counts: initialCounts(),
-          essence: state.essence + newEssence,
+          essence: currentEssence + newEssence,
           lifetimeEarnings: 0,
           lastSaveTime: Date.now(),
         })
       },
 
       loadGame() {
-        const data = load()
+        const data = load() as Partial<{
+          energy: unknown
+          counts: unknown
+          essence: unknown
+          lifetimeEarnings: unknown
+          lastSaveTime: unknown
+        }> | null
         if (!data) return
         set({
-          energy: data.energy,
-          counts: data.counts,
-          essence: data.essence,
-          lifetimeEarnings: data.lifetimeEarnings,
-          lastSaveTime: data.lastSaveTime,
+          energy: safeNumber(data.energy, 0),
+          counts: safeCounts(data.counts),
+          essence: safeNumber(data.essence, 0),
+          lifetimeEarnings: safeNumber(data.lifetimeEarnings, 0),
+          lastSaveTime: safeNumber(data.lastSaveTime, Date.now()),
           lastTickTime: Date.now(),
         })
       },
 
       applyOffline() {
-        const data = load()
+        const data = load() as Partial<{
+          energy: unknown
+          counts: unknown
+          essence: unknown
+          lifetimeEarnings: unknown
+          lastSaveTime: unknown
+        }> | null
         if (!data) return
-        const { energy, lifetimeEarnings } = simulateOfflineProgress(data, Date.now())
+        const sanitized = {
+          energy: safeNumber(data.energy, 0),
+          counts: safeCounts(data.counts),
+          essence: safeNumber(data.essence, 0),
+          lifetimeEarnings: safeNumber(data.lifetimeEarnings, 0),
+          lastSaveTime: safeNumber(data.lastSaveTime, Date.now()),
+        }
+        const { energy, lifetimeEarnings } = simulateOfflineProgress(sanitized, Date.now())
         set({
-          energy,
-          lifetimeEarnings,
+          energy: safeNumber(energy, sanitized.energy),
+          lifetimeEarnings: safeNumber(lifetimeEarnings, sanitized.lifetimeEarnings),
           lastSaveTime: Date.now(),
           lastTickTime: Date.now(),
         })
