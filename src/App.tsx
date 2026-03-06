@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { useGameLoop } from './hooks/useGameLoop'
 import { useAudio } from './hooks/useAudio'
 import { MainView } from './components/MainView'
@@ -47,6 +48,7 @@ function App() {
       </main>
       <ParticleEffect trigger={particleTrigger} />
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <Analytics />
     </div>
   )
 }

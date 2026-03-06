@@ -73,6 +73,7 @@ body {
   border: none;
   border-radius: 8px;
   color: #fff;
+  margin-bottom: 1em;
 }
 
 .btn-gather:active {
